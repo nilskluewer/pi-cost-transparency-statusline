@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Statusline theme gallery</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      background: #111318;
+      color: #e8eaf0;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    main { max-width: 1440px; margin: 0 auto; padding: 48px 24px 72px; }
+    header { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 32px; }
+    h1 { margin: 0 0 8px; font-size: clamp(2rem, 4vw, 3.4rem); letter-spacing: -.04em; }
+    .lede { max-width: 760px; margin: 0; color: #a8adbb; line-height: 1.55; }
+    .filter { display: grid; gap: 7px; min-width: 210px; color: #a8adbb; font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    select { border: 1px solid #343947; border-radius: 9px; padding: 11px 12px; background: #1a1d25; color: #f1f3f8; font: inherit; letter-spacing: normal; text-transform: none; }
+    .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(410px, 1fr)); gap: 18px; }
+    .theme-card { overflow: hidden; border: 1px solid #2b303c; border-radius: 16px; background: #171a21; box-shadow: 0 14px 36px #0004; transition: border-color .2s, transform .2s; }
+    .theme-card:hover, .theme-card:focus-within { border-color: var(--primary); transform: translateY(-2px); }
+    .theme-card[hidden] { display: none; }
+    .card-head { display: flex; align-items: start; justify-content: space-between; gap: 16px; padding: 19px 20px 14px; }
+    .card-head h2 { margin: 0 0 5px; font-size: 1.05rem; }
+    .card-head p { margin: 0; color: #989eac; font-size: .86rem; line-height: 1.4; }
+    .era { flex: none; border: 1px solid #343947; border-radius: 999px; padding: 5px 9px; color: #b9bfcb; font: 700 .7rem ui-monospace, SFMono-Regular, Menlo, monospace; white-space: nowrap; }
+    .preview { margin: 0 12px; padding: 17px 16px 15px; border: 1px solid color-mix(in srgb, var(--primary) 24%, transparent); border-radius: 10px; background: var(--bg); color: var(--text); font: 13px/1.65 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; box-shadow: inset 0 0 30px #0005; }
+    .row { display: flex; gap: 10px; min-width: 0; white-space: nowrap; }
+    .row > * { min-width: 0; }
+    .row .grow { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+    .primary { color: var(--primary); }
+    .secondary { color: var(--secondary); }
+    .warning { color: var(--warning); }
+    .accent { color: var(--accent); }
+    .good { color: var(--good); }
+    .bad { color: var(--bad); }
+    .muted { color: var(--muted); }
+    .dim { color: var(--dim); }
+    .meter { letter-spacing: -1px; }
+    .meter .empty { color: var(--empty); }
+    .metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 8px; padding-top: 9px; border-top: 1px solid color-mix(in srgb, var(--dim) 65%, transparent); }
+    .metric { display: grid; gap: 2px; min-width: 0; }
+    .metric b { overflow: hidden; text-overflow: ellipsis; font-weight: 700; }
+    .metric small { color: var(--muted); font-size: .72rem; }
+    .context { display: flex; justify-content: space-between; gap: 12px; margin-top: 9px; color: var(--muted); }
+    .context strong { color: var(--accent); }
+    .swatches { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; padding: 15px 20px 19px; }
+    .swatch { display: grid; gap: 5px; color: #9198a8; font: .66rem ui-monospace, SFMono-Regular, Menlo, monospace; text-transform: uppercase; }
+    .swatch i { display: block; height: 17px; border: 1px solid #fff3; border-radius: 4px; background: var(--swatch); box-shadow: 0 2px 6px #0005; }
+    .sources { margin-top: 52px; padding-top: 26px; border-top: 1px solid #2b303c; color: #a8adbb; line-height: 1.55; }
+    .sources h2 { margin: 0 0 8px; color: #e8eaf0; font-size: 1rem; }
+    .sources p { margin: 7px 0; }
+    .sources a { color: #8fc9ff; }
+    code { color: #d9dce5; }
+    @media (max-width: 700px) {
+      main { padding: 28px 14px 48px; }
+      header { display: grid; align-items: start; }
+      .gallery { grid-template-columns: minmax(0, 1fr); }
+      .theme-card { min-width: 0; }
+      .row { font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <h1>Statusline theme gallery</h1>
+        <p class="lede">Ten colorways spanning classic phosphor terminals and the most recognizable open-source developer palettes. The terminal footer uses the foreground colors shown here; the dark backgrounds make their intended contrast easy to compare.</p>
+      </div>
+      <label class="filter">Show theme
+        <select id="theme-filter" aria-label="Filter theme previews">
+          <option value="all">All themes</option>
+          <option value="pastel-sci-fi">Pastel Sci-Fi</option>
+          <option value="green-screen">Green Screen</option>
+          <option value="amber-crt">Amber CRT</option>
+          <option value="monokai">Monokai</option>
+          <option value="solarized-dark">Solarized Dark</option>
+          <option value="dracula">Dracula</option>
+          <option value="gruvbox">Gruvbox</option>
+          <option value="nord">Nord</option>
+          <option value="tokyo-night">Tokyo Night</option>
+          <option value="catppuccin-mocha">Catppuccin Mocha</option>
+        </select>
+      </label>
+    </header>
+
+    <section class="gallery" aria-label="Statusline themes">
+      <article class="theme-card" data-theme="pastel-sci-fi" style="--bg:#1a1825;--text:#e7dcff;--muted:#aaa6c2;--dim:#504c60;--empty:#454154;--primary:#89cff0;--secondary:#ffbe98;--warning:#ffe28a;--accent:#c3b1e1;--good:#a8e6a3;--bad:#ff9aa2">
+        <div class="card-head"><div><h2>Pastel Sci-Fi</h2><p>Current default · soft telemetry dashboard</p></div><span class="era">existing</span></div>
+        <div class="preview"><div class="row"><span class="primary grow">~/GitHub/statusline  ⎇ main</span><span class="dim">┄┄┄</span><span class="accent">◈ claude-sonnet</span></div><div class="row"><span class="muted">▲ Input</span><span class="good">12k</span><span class="muted">▼ Output</span><span class="bad">3k</span><span class="muted">◆ Cache</span><span class="secondary">8k</span></div><div class="metrics"><div class="metric"><small>Context</small><b class="accent">42k / 200k</b></div><div class="metric"><small>Cache hit</small><b class="secondary meter">├━━━━━━──────┤</b></div><div class="metric"><small>Total</small><b class="good">$0.1842</b></div></div><div class="context"><span>Thinking · medium</span><strong>Ready</strong></div></div>
+        <div class="swatches"><span class="swatch"><i style="--swatch:var(--primary)"></i>primary</span><span class="swatch"><i style="--swatch:var(--secondary)"></i>cache</span><span class="swatch"><i style="--swatch:var(--warning)"></i>warning</span><span class="swatch"><i style="--swatch:var(--good)"></i>good</span><span class="swatch"><i style="--swatch:var(--bad)"></i>cost</span></div>
+      </article>
+
+      <article class="theme-card" data-theme="green-screen" style="--bg:#061a12;--text:#b7f7c5;--muted:#5aa879;--dim:#2b6d4a;--empty:#123a29;--primary:#54d68b;--secondary:#84f7aa;--warning:#d7f56b;--accent:#a5ffd6;--good:#66ff99;--bad:#ff7777">
+        <div class="card-head"><div><h2>Green Screen</h2><p>Phosphor green · IBM 3270-era terminal memory</p></div><span class="era">1970s</span></div>
+        <div class="preview"><div class="row"><span class="primary grow">~/GitHub/statusline  ⎇ main</span><span class="dim">┄┄┄</span><span class="accent">◈ claude-sonnet</span></div><div class="row"><span class="muted">▲ Input</span><span class="good">12k</span><span class="muted">▼ Output</span><span class="bad">3k</span><span class="muted">◆ Cache</span><span class="secondary">8k</span></div><div class="metrics"><div class="metric"><small>Context</small><b class="accent">42k / 200k</b></div><div class="metric"><small>Cache hit</small><b class="secondary meter">├━━━━━━──────┤</b></div><div class="metric"><small>Total</small><b class="good">$0.1842</b></div></div><div class="context"><span>Thinking · medium</span><strong>Ready</strong></div></div>
+        <div class="swatches"><span class="swatch"><i style="--swatch:var(--primary)"></i>primary</span><span class="swatch"><i style="--swatch:var(--secondary)"></i>cache</span><span class="swatch"><i style="--swatch:var(--warning)"></i>warning</span><span class="swatch"><i style="--swatch:var(--good)"></i>good</span><span class="swatch"><i style="--swatch:var(--bad)"></i>cost</span></div>
+      </article>
+
+      <article class="theme-card" data-theme="amber-crt" style="--bg:#1a0e02;--text:#ffd58a;--muted:#b8782f;--dim:#623b13;--empty:#3f2208;--primary:#ffb52e;--secondary:#f08a24;--warning:#ffe08a;--accent:#ffc65c;--good:#ffd166;--bad:#ff7043">
+        <div class="card-head"><div><h2>Amber CRT</h2><p>Warm monochrome · P3 amber monitor glow</p></div><span class="era">1980s</span></div>
+        <div class="preview"><div class="row"><span class="primary grow">~/GitHub/statusline  ⎇ main</span><span class="dim">┄┄┄</span><span class="accent">◈ claude-sonnet</span></div><div class="row"><span class="muted">▲ Input</span><span class="good">12k</span><span class="muted">▼ Output</span><span class="bad">3k</span><span class="muted">◆ Cache</span><span class="secondary">8k</span></div><div class="metrics"><div class="metric"><small>Context</small><b class="accent">42k / 200k</b></div><div class="metric"><small>Cache hit</small><b class="secondary meter">├━━━━━━──────┤</b></div><div class="metric"><small>Total</small><b class="good">$0.1842</b></div></div><div class="context"><span>Thinking · medium</span><strong>Ready</strong></div></div>
+        <div class="swatches"><span class="swatch"><i style="--swatch:var(--primary)"></i>primary</span><span class="swatch"><i style="--swatch:var(--secondary)"></i>cache</span><span class="swatch"><i style="--swatch:var(--warning)"></i>warning</span><span class="swatch"><i style="--swatch:var(--good)"></i>good</span><span class="swatch"><i style="--swatch:var(--bad)"></i>cost</span></div>
+      </article>
+
+      <article class="theme-card" data-theme="monokai" style="--bg:#272822;--text:#f8f8f2;--muted:#75715e;--dim:#49483e;--empty:#3e3d32;--primary:#66d9ef;--secondary:#fd971f;--warning:#e6db74;--accent:#ae81ff;--good:#a6e22e;--bad:#f92672">
+        <div class="card-head"><div><h2>Monokai</h2><p>High-saturation dark editor classic</p></div><span class="era">2006</span></div>
+        <div class="preview"><div class="row"><span class="primary grow">~/GitHub/statusline  ⎇ main</span><span class="dim">┄┄┄</span><span class="accent">◈ claude-sonnet</span></div><div class="row"><span class="muted">▲ Input</span><span class="good">12k</span><span class="muted">▼ Output</span><span class="bad">3k</span><span class="muted">◆ Cache</span><span class="secondary">8k</span></div><div class="metrics"><div class="metric"><small>Context</small><b class="accent">42k / 200k</b></div><div class="metric"><small>Cache hit</small><b class="secondary meter">├━━━━━━──────┤</b></div><div class="metric"><small>Total</small><b class="good">$0.1842</b></div></div><div class="context"><span>Thinking · medium</span><strong>Ready</strong></div></div>
+        <div class="swatches"><span class="swatch"><i style="--swatch:var(--primary)"></i>primary</span><span class="swatch"><i style="--swatch:var(--secondary)"></i>cache</span><span class="swatch"><i style="--swatch:var(--warning)"></i>warning</span><span class="swatch"><i style="--swatch:var(--good)"></i>good</span><span class="swatch"><i style="--swatch:var(--bad)"></i>cost</span></div>
+      </article>
+
+      <article class="theme-card" data-theme="solarized-dark" style="--bg:#002b36;--text:#93a1a1;--muted:#657b83;--dim:#586e75;--empty:#073642;--primary:#2aa198;--secondary:#cb4b16;--warning:#b58900;--accent:#6c71c4;--good:#859900;--bad:#dc322f">
+        <div class="card-head"><div><h2>Solarized Dark</h2><p>Precision-balanced terminal palette</p></div><span class="era">2011</span></div>
+        <div class="preview"><div class="row"><span class="primary grow">~/GitHub/statusline  ⎇ main</span><span class="dim">┄┄┄</span><span class="accent">◈ claude-sonnet</span></div><div class="row"><span class="muted">▲ Input</span><span class="good">12k</span><span class="muted">▼ Output</span><span class="bad">3k</span><span class="muted">◆ Cache</span><span class="secondary">8k</span></div><div class="metrics"><div class="metric"><small>Context</small><b class="accent">42k / 200k</b></div><div class="metric"><small>Cache hit</small><b class="secondary meter">├━━━━━━──────┤</b></div><div class="metric"><small>Total</small><b class="good">$0.1842</b></div></div><div class="context"><span>Thinking · medium</span><strong>Ready</strong></div></div>
+        <div class="swatches"><span class="swatch"><i style="--swatch:var(--primary)"></i>primary</span><span class="swatch"><i style="--swatch:var(--secondary)"></i>cache</span><span class="swatch"><i style="--swatch:var(--warning)"></i>warning</span><span class="swatch"><i style="--swatch:var(--good)"></i>good</span><span class="swatch"><i style="--swatch:var(--bad)"></i>cost</span></div>
+      </article>
+
+      <article class="theme-card" data-theme="dracula" style="--bg:#282a36;--text:#f8f8f2;--muted:#6272a4;--dim:#44475a;--empty:#44475a;--primary:#8be9fd;--secondary:#ffb86c;--warning:#f1fa8c;--accent:#bd93f9;--good:#50fa7b;--bad:#ff5555">
+        <div class="card-head"><div><h2>Dracula</h2><p>Dark purple with vivid neon accents</p></div><span class="era">2013</span></div>
+        <div class="preview"><div class="row"><span class="primary grow">~/GitHub/statusline  ⎇ main</span><span class="dim">┄┄┄</span><span class="accent">◈ claude-sonnet</span></div><div class="row"><span class="muted">▲ Input</span><span class="good">12k</span><span class="muted">▼ Output</span><span class="bad">3k</span><span class="muted">◆ Cache</span><span class="secondary">8k</span></div><div class="metrics"><div class="metric"><small>Context</small><b class="accent">42k / 200k</b></div><div class="metric"><small>Cache hit</small><b class="secondary meter">├━━━━━━──────┤</b></div><div class="metric"><small>Total</small><b class="good">$0.1842</b></div></div><div class="context"><span>Thinking · medium</span><strong>Ready</strong></div></div>
+        <div class="swatches"><span class="swatch"><i style="--swatch:var(--primary)"></i>primary</span><span class="swatch"><i style="--swatch:var(--secondary)"></i>cache</span><span class="swatch"><i style="--swatch:var(--warning)"></i>warning</span><span class="swatch"><i style="--swatch:var(--good)"></i>good</span><span class="swatch"><i style="--swatch:var(--bad)"></i>cost</span></div>
+      </article>
+
+      <article class="theme-card" data-theme="gruvbox" style="--bg:#282828;--text:#ebdbb2;--muted:#a89984;--dim:#665c54;--empty:#3c3836;--primary:#8ec07c;--secondary:#fe8019;--warning:#fabd2f;--accent:#d3869b;--good:#b8bb26;--bad:#fb4934">
+        <div class="card-head"><div><h2>Gruvbox</h2><p>Earthy, warm, retro groove</p></div><span class="era">2013–14</span></div>
+        <div class="preview"><div class="row"><span class="primary grow">~/GitHub/statusline  ⎇ main</span><span class="dim">┄┄┄</span><span class="accent">◈ claude-sonnet</span></div><div class="row"><span class="muted">▲ Input</span><span class="good">12k</span><span class="muted">▼ Output</span><span class="bad">3k</span><span class="muted">◆ Cache</span><span class="secondary">8k</span></div><div class="metrics"><div class="metric"><small>Context</small><b class="accent">42k / 200k</b></div><div class="metric"><small>Cache hit</small><b class="secondary meter">├━━━━━━──────┤</b></div><div class="metric"><small>Total</small><b class="good">$0.1842</b></div></div><div class="context"><span>Thinking · medium</span><strong>Ready</strong></div></div>
+        <div class="swatches"><span class="swatch"><i style="--swatch:var(--primary)"></i>primary</span><span class="swatch"><i style="--swatch:var(--secondary)"></i>cache</span><span class="swatch"><i style="--swatch:var(--warning)"></i>warning</span><span class="swatch"><i style="--swatch:var(--good)"></i>good</span><span class="swatch"><i style="--swatch:var(--bad)"></i>cost</span></div>
+      </article>
+
+      <article class="theme-card" data-theme="nord" style="--bg:#2e3440;--text:#eceff4;--muted:#81a1c1;--dim:#4c566a;--empty:#3b4252;--primary:#88c0d0;--secondary:#d08770;--warning:#ebcb8b;--accent:#b48ead;--good:#a3be8c;--bad:#bf616a">
+        <div class="card-head"><div><h2>Nord</h2><p>Restrained arctic blue-gray palette</p></div><span class="era">2016</span></div>
+        <div class="preview"><div class="row"><span class="primary grow">~/GitHub/statusline  ⎇ main</span><span class="dim">┄┄┄</span><span class="accent">◈ claude-sonnet</span></div><div class="row"><span class="muted">▲ Input</span><span class="good">12k</span><span class="muted">▼ Output</span><span class="bad">3k</span><span class="muted">◆ Cache</span><span class="secondary">8k</span></div><div class="metrics"><div class="metric"><small>Context</small><b class="accent">42k / 200k</b></div><div class="metric"><small>Cache hit</small><b class="secondary meter">├━━━━━━──────┤</b></div><div class="metric"><small>Total</small><b class="good">$0.1842</b></div></div><div class="context"><span>Thinking · medium</span><strong>Ready</strong></div></div>
+        <div class="swatches"><span class="swatch"><i style="--swatch:var(--primary)"></i>primary</span><span class="swatch"><i style="--swatch:var(--secondary)"></i>cache</span><span class="swatch"><i style="--swatch:var(--warning)"></i>warning</span><span class="swatch"><i style="--swatch:var(--good)"></i>good</span><span class="swatch"><i style="--swatch:var(--bad)"></i>cost</span></div>
+      </article>
+
+      <article class="theme-card" data-theme="tokyo-night" style="--bg:#1a1b26;--text:#c0caf5;--muted:#a9b1d6;--dim:#3b4261;--empty:#24283b;--primary:#7dcfff;--secondary:#ff9e64;--warning:#e0af68;--accent:#bb9af7;--good:#9ece6a;--bad:#f7768e">
+        <div class="card-head"><div><h2>Tokyo Night</h2><p>Neon city lights over deep navy</p></div><span class="era">2019</span></div>
+        <div class="preview"><div class="row"><span class="primary grow">~/GitHub/statusline  ⎇ main</span><span class="dim">┄┄┄</span><span class="accent">◈ claude-sonnet</span></div><div class="row"><span class="muted">▲ Input</span><span class="good">12k</span><span class="muted">▼ Output</span><span class="bad">3k</span><span class="muted">◆ Cache</span><span class="secondary">8k</span></div><div class="metrics"><div class="metric"><small>Context</small><b class="accent">42k / 200k</b></div><div class="metric"><small>Cache hit</small><b class="secondary meter">├━━━━━━──────┤</b></div><div class="metric"><small>Total</small><b class="good">$0.1842</b></div></div><div class="context"><span>Thinking · medium</span><strong>Ready</strong></div></div>
+        <div class="swatches"><span class="swatch"><i style="--swatch:var(--primary)"></i>primary</span><span class="swatch"><i style="--swatch:var(--secondary)"></i>cache</span><span class="swatch"><i style="--swatch:var(--warning)"></i>warning</span><span class="swatch"><i style="--swatch:var(--good)"></i>good</span><span class="swatch"><i style="--swatch:var(--bad)"></i>cost</span></div>
+      </article>
+
+      <article class="theme-card" data-theme="catppuccin-mocha" style="--bg:#1e1e2e;--text:#cdd6f4;--muted:#a6adc8;--dim:#45475a;--empty:#313244;--primary:#89dceb;--secondary:#fab387;--warning:#f9e2af;--accent:#cba6f7;--good:#a6e3a1;--bad:#f38ba8">
+        <div class="card-head"><div><h2>Catppuccin Mocha</h2><p>Soothing pastel dark flavor</p></div><span class="era">2021</span></div>
+        <div class="preview"><div class="row"><span class="primary grow">~/GitHub/statusline  ⎇ main</span><span class="dim">┄┄┄</span><span class="accent">◈ claude-sonnet</span></div><div class="row"><span class="muted">▲ Input</span><span class="good">12k</span><span class="muted">▼ Output</span><span class="bad">3k</span><span class="muted">◆ Cache</span><span class="secondary">8k</span></div><div class="metrics"><div class="metric"><small>Context</small><b class="accent">42k / 200k</b></div><div class="metric"><small>Cache hit</small><b class="secondary meter">├━━━━━━──────┤</b></div><div class="metric"><small>Total</small><b class="good">$0.1842</b></div></div><div class="context"><span>Thinking · medium</span><strong>Ready</strong></div></div>
+        <div class="swatches"><span class="swatch"><i style="--swatch:var(--primary)"></i>primary</span><span class="swatch"><i style="--swatch:var(--secondary)"></i>cache</span><span class="swatch"><i style="--swatch:var(--warning)"></i>warning</span><span class="swatch"><i style="--swatch:var(--good)"></i>good</span><span class="swatch"><i style="--swatch:var(--bad)"></i>cost</span></div>
+      </article>
+    </section>
+
+    <section class="sources">
+      <h2>Research notes and sources</h2>
+      <p>The selection combines iconic terminal-era phosphor colors with widely adopted developer themes; “most popular” has no single historical ranking. Classic display context: <a href="https://www.si.edu/object/nmah_1321868" rel="noreferrer">Smithsonian Amdek P3 amber monitor</a>, <a href="https://www.ibm.com/docs/en/cics-ts/5.6.0?topic=terminals-3270-field-attributes" rel="noreferrer">IBM 3270 field attributes</a>.</p>
+      <p>Palette references: <a href="https://monokai.com/articles/monokai-pro-beautiful-functionality-for-professional-developers/" rel="noreferrer">Monokai</a>, <a href="https://ethanschoonover.com/solarized/" rel="noreferrer">Solarized</a>, <a href="https://github.com/dracula/dracula-theme" rel="noreferrer">Dracula</a>, <a href="https://github.com/morhetz/gruvbox" rel="noreferrer">Gruvbox</a>, <a href="https://www.nordtheme.com/" rel="noreferrer">Nord</a>, <a href="https://github.com/tokyo-night/tokyo-night-vscode-theme" rel="noreferrer">Tokyo Night</a>, and <a href="https://github.com/catppuccin/palette" rel="noreferrer">Catppuccin</a>.</p>
+      <p>Switch in Pi with <code>/statusline theme &lt;id&gt;</code>; the interactive selector is opened with <code>/statusline</code>.</p>
+    </section>
+  </main>
+  <script>
+    const filter = document.querySelector("#theme-filter");
+    const cards = [...document.querySelectorAll(".theme-card")];
+    filter.addEventListener("change", () => {
+      for (const card of cards) card.hidden = filter.value !== "all" && card.dataset.theme !== filter.value;
+    });
+  </script>
+</body>
+</html>

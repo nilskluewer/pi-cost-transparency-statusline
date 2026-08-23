@@ -20,13 +20,17 @@ import {
 	createDefaultConfig,
 	describeConfig,
 	isSegmentEnabled,
+	isThemeId,
 	listSegments,
+	listThemes,
 	loadConfig,
 	normalizeConfig,
 	saveConfig,
 	setSegment,
+	setTheme,
 	type SegmentId,
 	type StatuslineConfig,
+	type ThemeId,
 } from "./config.ts";
 import {
 	fetchCodexQuota,
@@ -42,43 +46,220 @@ const rgb =
 	(text: string): string =>
 		`\x1b[38;2;${r};${g};${b}m${text}\x1b[0m`;
 
-// ── Palette ─────────────────────────────────────────────────────────────────
-const c = {
-	// Navigation (line 1)
-	cwd: rgb(137, 207, 240),
-	branch: rgb(255, 190, 152),
-	worktree: rgb(255, 211, 145),
-	model: rgb(184, 192, 255),
-	thinking: rgb(255, 226, 138),
-	runState: rgb(152, 228, 198),
+type Color = (text: string) => string;
 
-	// Labels - muted lavender lets the values stand out
-	label: rgb(170, 166, 194),
-
-	// Token counts
-	tokIn: rgb(168, 230, 163),
-	tokOut: rgb(255, 154, 162),
-	tokCacheR: rgb(255, 191, 138),
-	tokCacheW: rgb(255, 191, 138),
-	cacheHit: rgb(255, 191, 138),
-	context: rgb(195, 177, 225),
-	contextEmpty: rgb(69, 65, 84),
-	contextText: rgb(231, 220, 255),
-
-	// Cost breakdown
-	costIn: rgb(168, 230, 163),
-	costOut: rgb(255, 154, 162),
-	costCacheR: rgb(255, 191, 138),
-	costCacheW: rgb(255, 191, 138),
-	costTotal: rgb(152, 228, 198),
-
-	// Runtime integrations
-	task: rgb(137, 207, 240),
-	quota: rgb(152, 228, 198),
-
-	// Structural
-	sep: rgb(80, 76, 96),
+type Palette = {
+	cwd: Color;
+	branch: Color;
+	worktree: Color;
+	model: Color;
+	thinking: Color;
+	runState: Color;
+	label: Color;
+	tokIn: Color;
+	tokOut: Color;
+	tokCacheR: Color;
+	tokCacheW: Color;
+	cacheHit: Color;
+	context: Color;
+	contextEmpty: Color;
+	contextText: Color;
+	costIn: Color;
+	costOut: Color;
+	costCacheR: Color;
+	costCacheW: Color;
+	costTotal: Color;
+	task: Color;
+	quota: Color;
+	sep: Color;
 };
+
+interface ThemeColors {
+	primary: string;
+	secondary: string;
+	warning: string;
+	accent: string;
+	good: string;
+	status?: string;
+	bad: string;
+	text: string;
+	muted: string;
+	dim: string;
+	empty: string;
+}
+
+function hexColor(value: string): Color {
+	const hex = Number.parseInt(value.replace(/^#/, ""), 16);
+	return rgb((hex >> 16) & 0xff, (hex >> 8) & 0xff, hex & 0xff);
+}
+
+function makePalette(colors: ThemeColors): Palette {
+	const primary = hexColor(colors.primary);
+	const secondary = hexColor(colors.secondary);
+	const warning = hexColor(colors.warning);
+	const accent = hexColor(colors.accent);
+	const good = hexColor(colors.good);
+	const status = hexColor(colors.status ?? colors.good);
+	const bad = hexColor(colors.bad);
+	const text = hexColor(colors.text);
+	const muted = hexColor(colors.muted);
+	const dim = hexColor(colors.dim);
+	const empty = hexColor(colors.empty);
+	return {
+		cwd: primary,
+		branch: secondary,
+		worktree: warning,
+		model: accent,
+		thinking: warning,
+		runState: status,
+		label: muted,
+		tokIn: good,
+		tokOut: bad,
+		tokCacheR: secondary,
+		tokCacheW: secondary,
+		cacheHit: secondary,
+		context: accent,
+		contextEmpty: empty,
+		contextText: text,
+		costIn: good,
+		costOut: bad,
+		costCacheR: secondary,
+		costCacheW: secondary,
+		costTotal: status,
+		task: primary,
+		quota: status,
+		sep: dim,
+	};
+}
+
+// The palettes use the canonical colours of the original schemes where they exist.
+const PALETTES: Record<ThemeId, Palette> = {
+	"pastel-sci-fi": makePalette({
+		primary: "#89cff0",
+		secondary: "#ffbe98",
+		warning: "#ffe28a",
+		accent: "#c3b1e1",
+		good: "#a8e6a3",
+		status: "#98e4c6",
+		bad: "#ff9aa2",
+		text: "#e7dcff",
+		muted: "#aaa6c2",
+		dim: "#504c60",
+		empty: "#454154",
+	}),
+	"green-screen": makePalette({
+		primary: "#54d68b",
+		secondary: "#84f7aa",
+		warning: "#d7f56b",
+		accent: "#a5ffd6",
+		good: "#66ff99",
+		bad: "#ff7777",
+		text: "#b7f7c5",
+		muted: "#5aa879",
+		dim: "#2b6d4a",
+		empty: "#123a29",
+	}),
+	"amber-crt": makePalette({
+		primary: "#ffb52e",
+		secondary: "#f08a24",
+		warning: "#ffe08a",
+		accent: "#ffc65c",
+		good: "#ffd166",
+		bad: "#ff7043",
+		text: "#ffd58a",
+		muted: "#b8782f",
+		dim: "#623b13",
+		empty: "#3f2208",
+	}),
+	monokai: makePalette({
+		primary: "#66d9ef",
+		secondary: "#fd971f",
+		warning: "#e6db74",
+		accent: "#ae81ff",
+		good: "#a6e22e",
+		bad: "#f92672",
+		text: "#f8f8f2",
+		muted: "#75715e",
+		dim: "#49483e",
+		empty: "#3e3d32",
+	}),
+	"solarized-dark": makePalette({
+		primary: "#2aa198",
+		secondary: "#cb4b16",
+		warning: "#b58900",
+		accent: "#6c71c4",
+		good: "#859900",
+		bad: "#dc322f",
+		text: "#93a1a1",
+		muted: "#657b83",
+		dim: "#586e75",
+		empty: "#073642",
+	}),
+	dracula: makePalette({
+		primary: "#8be9fd",
+		secondary: "#ffb86c",
+		warning: "#f1fa8c",
+		accent: "#bd93f9",
+		good: "#50fa7b",
+		bad: "#ff5555",
+		text: "#f8f8f2",
+		muted: "#6272a4",
+		dim: "#44475a",
+		empty: "#44475a",
+	}),
+	gruvbox: makePalette({
+		primary: "#8ec07c",
+		secondary: "#fe8019",
+		warning: "#fabd2f",
+		accent: "#d3869b",
+		good: "#b8bb26",
+		bad: "#fb4934",
+		text: "#ebdbb2",
+		muted: "#a89984",
+		dim: "#665c54",
+		empty: "#3c3836",
+	}),
+	nord: makePalette({
+		primary: "#88c0d0",
+		secondary: "#d08770",
+		warning: "#ebcb8b",
+		accent: "#b48ead",
+		good: "#a3be8c",
+		bad: "#bf616a",
+		text: "#eceff4",
+		muted: "#81a1c1",
+		dim: "#4c566a",
+		empty: "#3b4252",
+	}),
+	"tokyo-night": makePalette({
+		primary: "#7dcfff",
+		secondary: "#ff9e64",
+		warning: "#e0af68",
+		accent: "#bb9af7",
+		good: "#9ece6a",
+		bad: "#f7768e",
+		text: "#c0caf5",
+		muted: "#a9b1d6",
+		dim: "#3b4261",
+		empty: "#24283b",
+	}),
+	"catppuccin-mocha": makePalette({
+		primary: "#89dceb",
+		secondary: "#fab387",
+		warning: "#f9e2af",
+		accent: "#cba6f7",
+		good: "#a6e3a1",
+		bad: "#f38ba8",
+		text: "#cdd6f4",
+		muted: "#a6adc8",
+		dim: "#45475a",
+		empty: "#313244",
+	}),
+};
+
+function getPalette(theme: ThemeId): Palette {
+	return PALETTES[theme] ?? PALETTES["pastel-sci-fi"];
+}
 
 const MODEL_COLUMN = 96;
 const STATUSLINE_STATUS_KEY = "pi-cost-transparency-statusline";
@@ -194,6 +375,12 @@ function saveSegmentConfig(config: StatuslineConfig, id: SegmentId, enabled: boo
 	return next;
 }
 
+function saveThemeConfig(config: StatuslineConfig, theme: ThemeId): StatuslineConfig {
+	const next = setTheme(config, theme);
+	saveConfig(next);
+	return next;
+}
+
 async function openStatuslineSelector(
 	ctx: ExtensionContext,
 	getConfig: () => StatuslineConfig,
@@ -209,11 +396,12 @@ async function openStatuslineSelector(
 		const title = new Text(
 			theme.fg("accent", theme.bold("Configure Status Line")) +
 				"\n" +
-				theme.fg("muted", "Select which items to display in the status line."),
+				theme.fg("muted", "Choose a color theme and the items to display in the status line."),
 			1,
 			1,
 		);
 		const segmentIds = new Set(listSegments().map((segment) => segment.id));
+		const themeIds = new Set(listThemes().map((item) => item.id));
 		const settingsTheme = getSettingsListTheme();
 		const checkboxTheme = {
 			...settingsTheme,
@@ -221,6 +409,13 @@ async function openStatuslineSelector(
 				settingsTheme.value(value === "enabled" ? "[x]" : value === "disabled" ? "[]" : value, selected),
 		};
 		const items: SettingItem[] = [
+			{
+				id: "theme",
+				label: "color-theme",
+				description: "Switch the statusline palette without changing Pi's main theme",
+				currentValue: getConfig().theme,
+				values: listThemes().map((item) => item.id),
+			},
 			...listSegments().map((segment) => ({
 				id: segment.id,
 				label: segment.label,
@@ -250,12 +445,16 @@ async function openStatuslineSelector(
 						const next = createDefaultConfig();
 						saveConfig(next);
 						setConfig(next);
+						settingsList.updateValue("theme", next.theme);
 						for (const segment of listSegments()) {
 							settingsList.updateValue(
 								segment.id,
 								statuslineSegment(next, segment.id) ? "enabled" : "disabled",
 							);
 						}
+					} else if (themeIds.has(newValue) && id === "theme") {
+						const next = saveThemeConfig(getConfig(), newValue as ThemeId);
+						setConfig(next);
 					} else if (segmentIds.has(id as SegmentId)) {
 						const next = saveSegmentConfig(getConfig(), id as SegmentId, newValue === "enabled");
 						setConfig(next);
@@ -350,8 +549,31 @@ export default function (pi: ExtensionAPI) {
 		}
 	};
 
+	const setThemeFromCommand = (ctx: ExtensionContext, name: string | undefined) => {
+		const theme = name?.toLowerCase();
+		if (!theme) {
+			const current = listThemes().find((item) => item.id === config.theme);
+			ctx.ui.notify(
+				`Current theme: ${current?.label ?? config.theme}\nAvailable: ${listThemes().map((item) => item.id).join(", ")}`,
+				"info",
+			);
+			return;
+		}
+		if (!isThemeId(theme)) {
+			ctx.ui.notify(`Unknown theme "${name}". Available: ${listThemes().map((item) => item.id).join(", ")}`, "warning");
+			return;
+		}
+		try {
+			const next = saveThemeConfig(config, theme);
+			applyConfig(next, ctx);
+			ctx.ui.notify(`Statusline theme set to "${theme}".`, "info");
+		} catch (error) {
+			ctx.ui.notify(`Could not save statusline settings: ${formatError(error)}`, "error");
+		}
+	};
+
 	const statuslineCommand = {
-		description: "Configure statusline items: list, add/on, remove/off, reset",
+		description: "Configure statusline theme and items: list, theme, add/on, remove/off, reset",
 		handler: async (args: string, ctx: ExtensionContext) => {
 			const tokens = args.trim().split(/\s+/).filter(Boolean);
 			const command = tokens[0]?.toLowerCase();
@@ -369,6 +591,10 @@ export default function (pi: ExtensionAPI) {
 				resetConfig(ctx);
 				return;
 			}
+			if (command === "theme") {
+				setThemeFromCommand(ctx, name);
+				return;
+			}
 			if (["on", "add"].includes(command)) {
 				setSegmentFromCommand(ctx, name, true);
 				return;
@@ -377,18 +603,23 @@ export default function (pi: ExtensionAPI) {
 				setSegmentFromCommand(ctx, name, false);
 				return;
 			}
-			ctx.ui.notify("Usage: /statusline [list|reset|on|off|add|remove] [segment]", "warning");
+			ctx.ui.notify("Usage: /statusline [list|theme|reset|on|off|add|remove] [theme|segment]", "warning");
 		},
 		getArgumentCompletions: (argumentPrefix: string) => {
 			const tokens = argumentPrefix.split(/\s+/);
 			if (tokens.length <= 1) {
 				const prefix = tokens[0] ?? "";
-				return ["list", "reset", "on", "off", "add", "remove"]
+				return ["list", "theme", "reset", "on", "off", "add", "remove"]
 					.filter((value) => value.startsWith(prefix))
 					.map((value) => ({ value, label: value }));
 			}
-			if (!["on", "off", "add", "remove", "rm"].includes(tokens[0] ?? "")) return null;
 			const prefix = tokens.at(-1) ?? "";
+			if (tokens[0] === "theme") {
+				return listThemes()
+					.filter((theme) => theme.id.startsWith(prefix))
+					.map((theme) => ({ value: theme.id, label: theme.label, description: theme.description }));
+			}
+			if (!["on", "off", "add", "remove", "rm"].includes(tokens[0] ?? "")) return null;
 			return listSegments()
 				.filter((segment) => segment.id.startsWith(prefix))
 				.map((segment) => ({ value: segment.id, label: segment.label, description: segment.description }));
@@ -413,6 +644,7 @@ export default function (pi: ExtensionAPI) {
 				},
 				invalidate() {},
 				render(width: number): string[] {
+					const c = getPalette(config.theme);
 					const totals = collectTotals(ctx);
 					const enabled = (id: SegmentId) => statuslineSegment(config, id);
 					const costTotal = totals.costIn + totals.costOut + totals.costCacheRead + totals.costCacheWrite;

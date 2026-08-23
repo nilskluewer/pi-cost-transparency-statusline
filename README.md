@@ -43,12 +43,35 @@ The same settings are available without the selector:
 
 ```text
 /statusline list
+/statusline theme dracula
+/statusline theme
 /statusline add run-state
 /statusline remove cache-write
 /statusline reset
 ```
 
 Available items include model/reasoning, Git branch/worktree, all token/cache counters, context, estimated session cost, extension task progress, and subscription quota.
+
+### Themes
+
+`/statusline` includes a switchable color-theme setting. The palette set combines the most recognizable terminal-era and developer themes rather than claiming a single universal popularity ranking:
+
+| Theme ID | Historical reference |
+| --- | --- |
+| `pastel-sci-fi` | Existing default telemetry palette |
+| `green-screen` | 1970s phosphor terminals and IBM 3270 |
+| `amber-crt` | 1980s P3 amber monochrome monitors |
+| `monokai` | 2006 TextMate; later Sublime Text default |
+| `solarized-dark` | Ethan Schoonover's 2011 terminal palette |
+| `dracula` | 2013 open-source dark theme |
+| `gruvbox` | 2013–14 retro Vim palette |
+| `nord` | 2016 arctic palette |
+| `tokyo-night` | 2019 night-themed editor palette |
+| `catppuccin-mocha` | 2021 pastel dark flavor |
+
+Open [theme-preview.html](./theme-preview.html) for an interactive visual gallery and source links. The statusline uses 24-bit foreground colors, so each theme keeps the user's terminal background.
+
+Historical references: [Smithsonian P3 monitor](https://www.si.edu/object/nmah_1321868), [IBM 3270 field attributes](https://www.ibm.com/docs/en/cics-ts/5.6.0?topic=terminals-3270-field-attributes), [Monokai](https://monokai.com/articles/monokai-pro-beautiful-functionality-for-professional-developers/), [Solarized](https://ethanschoonover.com/solarized/), [Dracula](https://github.com/dracula/dracula-theme), [Gruvbox](https://github.com/morhetz/gruvbox), [Nord](https://www.nordtheme.com/), [Tokyo Night](https://github.com/tokyo-night/tokyo-night-vscode-theme), and [Catppuccin](https://github.com/catppuccin/palette).
 
 In a Git worktree, the first line includes both identities:
 

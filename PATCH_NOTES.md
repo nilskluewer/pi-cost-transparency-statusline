@@ -12,12 +12,15 @@
 - Added Claude/Anthropic subscription quota support when provider rate-limit data is available.
 - Added quota reset countdowns and Codex-style `weekly % left` wording.
 - Added the statusline preview screenshot.
+- Added ten switchable statusline themes: Pastel Sci-Fi, Green Screen, Amber CRT, Monokai, Solarized Dark, Dracula, Gruvbox, Nord, Tokyo Night, and Catppuccin Mocha.
+- Added the interactive `theme-preview.html` gallery with historical context and palette sources.
 
 ### Changed
 
 - The command surface is now intentionally limited to `/statusline`.
 - Quota percentages are clearly labelled as remaining percentage rather than used percentage.
 - Statusline preferences are persisted and can be changed without editing configuration files.
+- Themes can be changed with `/statusline theme <theme-id>` or from the `/statusline` selector.
 
 ### Notes
 
