@@ -3,7 +3,7 @@
  *
  * Friendly pastel palette designed for dark terminal backgrounds.
  *
- * Line 1:  ~/path/to/cwd ⎇ git-branch ┄┄┄┄┄┄┄┄┄ ◈ model · thinking
+ * Line 1:  ~/path/to/cwd ⎇ git-branch/no-worktree ┄┄┄┄┄┄┄ ◈ model · thinking
  * Line 2:  ▲ Input  ┊  ▼ Output  ┊  ◆ Cache read  ┊  ◆ Cache write  ┊  ✦ Cache hit
  * Line 3:  Nk       ┊  Nk        ┊  Nk            ┊  Nk             ┊  XX.X%
  * Line 4:  $X.XXXX  ┊  $X.XXXX   ┊  $X.XXXX       ┊  $X.XXXX        ┊  ├━━━━━━──┤
@@ -167,10 +167,11 @@ export default function (pi: ExtensionAPI) {
 					// ── Helpers ──────────────────────────────────────────────────
 					const SEP = c.sep("  ┊  ");
 
-					// ── Line 1: path  (branch)  ·····  Model: model  (thinking) ──
+					// ── Line 1: path  (branch/worktree status)  ·····  Model: model  (thinking) ──
 					const cwd = ctx.cwd.startsWith(home) ? `~${ctx.cwd.slice(home.length)}` : ctx.cwd;
 					const branch = footerData.getGitBranch();
-					const left1 = c.cwd(cwd) + (branch ? "  " + c.branch(`⎇ ${branch}`) : "");
+					const worktree = branch ? c.branch(`⎇ ${branch}`) : c.branch("⊘ no worktree");
+					const left1 = c.cwd(cwd) + "  " + worktree;
 					const fixedLeft1 = truncateToWidth(left1, MODEL_COLUMN - 2, "");
 					const leader1 = c.sep(
 						" " + "┄".repeat(Math.max(1, MODEL_COLUMN - visibleWidth(fixedLeft1) - 2)) + " ",

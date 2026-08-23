@@ -6,7 +6,7 @@ A cost transparency status line for the [Pi coding agent](https://pi.dev/).
 
 It replaces Pi's footer with a compact pastel telemetry dashboard that makes token usage and spend fully transparent:
 
-- current working directory and Git branch
+- current working directory and Git branch, or a `no worktree` indicator outside Git
 - active model and thinking level
 - accumulated input/output/cache-read/cache-write tokens
 - cache hit rate with a colored progress rail
