@@ -2,6 +2,14 @@
 
 A cost transparency status line for the [Pi coding agent](https://pi.dev/).
 
+## Setup
+
+```text
+/statusline
+```
+
+After installing the package, run `/statusline` in Pi to open the selector and choose the status-line items to display.
+
 ![Pi cost transparency status line showing its pastel sci-fi telemetry dashboard](./assets/statusline-preview.png)
 
 It replaces Pi's footer with a compact pastel telemetry dashboard that makes token usage and spend fully transparent:
@@ -29,13 +37,7 @@ pi install /absolute/path/to/pi-cost-transparency-statusline
 
 ## Configure
 
-Open the interactive selector:
-
-```text
-/statusline
-```
-
-The selector follows Codex's status-line configuration pattern. Toggle items with Space or Enter, search with typing, and close with Escape. Preferences are stored in `${PI_CODING_AGENT_DIR:-~/.pi/agent}/pi-cost-transparency-statusline.json`.
+The `/statusline` selector follows Codex's status-line configuration pattern. Toggle items with Space or Enter, search with typing, and close with Escape. Preferences are stored in `${PI_CODING_AGENT_DIR:-~/.pi/agent}/pi-cost-transparency-statusline.json`.
 
 The same settings are available without the selector:
 
@@ -67,15 +69,6 @@ Quota Codex Plus · weekly 78% left · resets in 6d 19h 3m
 API-key authentication does not expose ChatGPT subscription quota.
 
 For Anthropic/Claude OAuth, Pi uses subscription rate-limit headers when the provider exposes them. API-key usage is not presented as a subscription quota.
-
-## Configuration reference
-
-These screenshots show the configuration style this extension follows:
-
-![Status-line configuration](./assets/statusline-config-codex-overview.png)
-![Quota and context items](./assets/statusline-config-codex-quota.png)
-![Runtime and token items](./assets/statusline-config-codex-runtime.png)
-![Live status-line preview](./assets/statusline-config-codex-preview.png)
 
 ## Patch notes
 
