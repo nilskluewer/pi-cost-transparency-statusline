@@ -11,7 +11,7 @@
 - Added Codex subscription quota support through the local Codex app server.
 - Added Claude/Anthropic subscription quota support when provider rate-limit data is available.
 - Added quota reset countdowns and Codex-style `weekly % left` wording.
-- Added configuration and statusline preview screenshots.
+- Added the statusline preview screenshot.
 
 ### Changed
 

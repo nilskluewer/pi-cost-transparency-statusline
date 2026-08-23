@@ -1,6 +1,6 @@
 {
   "name": "@nilskluewer/pi-cost-transparency-statusline",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Cost transparency status line for Pi: full-detail token and cost breakdown (input/output/cache), cache hit rate, context usage, model, and thinking level.",
   "type": "module",
   "keywords": [
@@ -41,7 +41,8 @@
   "pi": {
     "extensions": [
       "./extensions/statusline.ts"
-    ]
+    ],
+    "image": "https://raw.githubusercontent.com/nilskluewer/pi-cost-transparency-statusline/feat/statusline-screenshot/assets/statusline-preview.png"
   },
   "peerDependencies": {
     "@earendil-works/pi-ai": "*",
