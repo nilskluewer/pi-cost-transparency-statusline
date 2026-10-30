@@ -261,7 +261,6 @@ function getPalette(theme: ThemeId): Palette {
 	return PALETTES[theme] ?? PALETTES["pastel-sci-fi"];
 }
 
-const MODEL_COLUMN = 96;
 const STATUSLINE_STATUS_KEY = "pi-cost-transparency-statusline";
 
 type RunState = "Ready" | "Thinking" | "Working";
@@ -684,6 +683,7 @@ export default function (pi: ExtensionAPI) {
 					const thinking = thinkingLabels[pi.getThinkingLevel()] ?? pi.getThinkingLevel();
 					const modelId = ctx.model?.id ?? "no model";
 					const modelShort = modelId.includes("/") ? modelId.split("/").pop()! : modelId;
+					const modelLabel = ctx.model ? `${ctx.model.provider}/${modelShort}` : modelShort;
 					const home = homedir();
 					const cwd = ctx.cwd.startsWith(home) ? `~${ctx.cwd.slice(home.length)}` : ctx.cwd;
 					const branch = footerData.getGitBranch();
@@ -694,29 +694,28 @@ export default function (pi: ExtensionAPI) {
 					if (enabled("git-worktree")) {
 						identityParts.push(c.worktree(worktreeName ? `⌂ worktree:${worktreeName}` : "⌂ no worktree"));
 					}
-					const identity = identityParts.join("  ");
-					const leftWidth = MODEL_COLUMN - 2;
-					const cwdSeparator = cwdPart && identity ? "  " : "";
-					const cwdWidth = Math.max(1, leftWidth - visibleWidth(identity) - visibleWidth(cwdSeparator));
-					const fixedCwd = cwdPart ? truncateToWidth(cwdPart, cwdWidth, "") : "";
-					const left1 = fixedCwd + cwdSeparator + identity;
-
 					const rightParts: string[] = [];
-					if (enabled("model")) rightParts.push(c.model(`◈ ${modelShort}`));
-					if (enabled("thinking")) rightParts.push(c.label(" · ") + c.thinking(thinking));
+					if (enabled("model")) rightParts.push(c.model(`◈ ${modelLabel}`));
+					if (enabled("thinking")) rightParts.push(c.thinking(thinking));
 					if (enabled("run-state")) {
 						const stateColor = runState === "Working" ? c.tokCacheW : runState === "Thinking" ? c.thinking : c.runState;
-						rightParts.push(c.label(" · ") + stateColor(runState));
+						rightParts.push(stateColor(runState));
 					}
-					const right1 = rightParts.join("");
+					const right1 = truncateToWidth(rightParts.join(c.label(" · ")), width, "");
+
+					// Reserve the model's space first; shrink the leader and directory on resize.
+					// Three columns leave room for the minimum leader: " ┄ ".
+					const leftWidth = right1 ? Math.max(0, width - visibleWidth(right1) - 3) : width;
+					const identity = truncateToWidth(identityParts.join("  "), leftWidth, "");
+					const cwdSeparator = cwdPart && identity ? "  " : "";
+					const cwdWidth = Math.max(0, leftWidth - visibleWidth(identity) - visibleWidth(cwdSeparator));
+					const fixedCwd = cwdPart && cwdWidth > 0 ? truncateToWidth(cwdPart, cwdWidth) : "";
+					const left1 = [fixedCwd, identity].filter((part) => visibleWidth(part) > 0).join("  ");
 
 					let line1 = "";
 					if (left1 && right1) {
-						const fixedLeft1 = truncateToWidth(left1, MODEL_COLUMN - 2, "");
-						const leader1 = c.sep(
-							" " + "┄".repeat(Math.max(1, MODEL_COLUMN - visibleWidth(fixedLeft1) - 2)) + " ",
-						);
-						line1 = fixedLeft1 + leader1 + right1;
+						const leaderWidth = width - visibleWidth(left1) - visibleWidth(right1) - 2;
+						line1 = left1 + c.sep(" " + "┄".repeat(leaderWidth) + " ") + right1;
 					} else {
 						line1 = left1 || right1;
 					}

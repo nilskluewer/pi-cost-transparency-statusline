@@ -61,7 +61,7 @@ export const SEGMENTS: readonly SegmentDefinition[] = [
 	{ id: "cwd", label: "current-dir", description: "Current working directory" },
 	{ id: "git-branch", label: "git-branch", description: "Current Git branch" },
 	{ id: "git-worktree", label: "git-worktree", description: "Current linked Git worktree name or no-worktree status" },
-	{ id: "model", label: "model", description: "Current model name" },
+	{ id: "model", label: "model", description: "Current provider and model name" },
 	{ id: "thinking", label: "reasoning", description: "Current thinking level" },
 	{ id: "run-state", label: "run-state", description: "Ready, working, or thinking state" },
 	{ id: "input", label: "input-tokens", description: "Accumulated input tokens" },

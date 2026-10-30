@@ -1,6 +1,6 @@
 {
   "name": "@nilskluewer/pi-cost-transparency-statusline",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Cost transparency status line for Pi: full-detail token and cost breakdown (input/output/cache), cache hit rate, context usage, model, and thinking level.",
   "type": "module",
   "keywords": [
@@ -55,6 +55,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
+    "test": "node --test scripts/*.test.mjs",
     "pack:dry": "npm pack --dry-run",
     "smoke": "node scripts/smoke.mjs",
     "prepublishOnly": "npm run smoke"

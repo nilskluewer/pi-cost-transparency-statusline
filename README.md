@@ -15,7 +15,7 @@ After installing the package, run `/statusline` in Pi to open the selector and c
 It replaces Pi's footer with a compact pastel telemetry dashboard that makes token usage and spend fully transparent:
 
 - current working directory, Git branch, and Git worktree name or no-worktree status
-- active model and thinking level
+- active provider, model, and thinking level
 - accumulated input/output/cache-read/cache-write tokens
 - cache hit rate with a colored progress rail
 - context window usage with a colored progress rail
@@ -50,7 +50,11 @@ The same settings are available without the selector:
 /statusline reset
 ```
 
-Available items include model/reasoning, Git branch/worktree, all token/cache counters, context, estimated session cost, extension task progress, and subscription quota.
+Available items include provider/model, reasoning, Git branch/worktree, all token/cache counters, context, estimated session cost, extension task progress, and subscription quota.
+
+The model item includes the provider ID, for example `◈ github-copilot/gpt-6.1-sol · medium` or `◈ google-vertex/gemini-pro · medium`. It uses your existing model-item setting; no configuration change is needed.
+
+The dotted separator adjusts to the terminal width. When the window gets narrower, the directory and Git details are shortened before the provider/model. The model details are shortened only when they cannot fit on their own.
 
 ### Themes
 

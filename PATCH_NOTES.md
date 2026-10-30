@@ -5,6 +5,7 @@
 ### Added
 
 - Added configurable statusline items through `/statusline`.
+- Added the active provider ID to the model item.
 - Added `[x]` and `[]` checkbox indicators to the statusline selector.
 - Added task progress and extension-status display.
 - Added Git worktree identity next to the Git branch in the statusline.
@@ -18,6 +19,7 @@
 ### Changed
 
 - The command surface is now intentionally limited to `/statusline`.
+- The dotted separator now adjusts to the terminal width and keeps model details visible when the window gets narrower.
 - Quota percentages are clearly labelled as remaining percentage rather than used percentage.
 - Statusline preferences are persisted and can be changed without editing configuration files.
 - Themes can be changed with `/statusline theme <theme-id>` or from the `/statusline` selector.
