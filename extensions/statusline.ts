@@ -342,16 +342,19 @@ function collectTotals(ctx: ExtensionContext): Totals {
 	};
 
 	for (const entry of ctx.sessionManager.getBranch()) {
-		if (entry.type !== "message" || entry.message.role !== "assistant") continue;
-		const message = entry.message as AssistantMessage;
-		totals.tokIn += message.usage.input;
-		totals.tokOut += message.usage.output;
-		totals.tokCacheRead += message.usage.cacheRead;
-		totals.tokCacheWrite += message.usage.cacheWrite;
-		totals.costIn += message.usage.cost.input;
-		totals.costOut += message.usage.cost.output;
-		totals.costCacheRead += message.usage.cost.cacheRead;
-		totals.costCacheWrite += message.usage.cost.cacheWrite;
+		if (entry.type !== "message") continue;
+		// Assistant turns, plus nested model work reported by tools (subagents, codemode).
+		if (entry.message.role !== "assistant" && entry.message.role !== "toolResult") continue;
+		const usage = (entry.message as AssistantMessage).usage;
+		if (!usage) continue;
+		totals.tokIn += usage.input;
+		totals.tokOut += usage.output;
+		totals.tokCacheRead += usage.cacheRead;
+		totals.tokCacheWrite += usage.cacheWrite;
+		totals.costIn += usage.cost.input;
+		totals.costOut += usage.cost.output;
+		totals.costCacheRead += usage.cost.cacheRead;
+		totals.costCacheWrite += usage.cost.cacheWrite;
 	}
 
 	return totals;
